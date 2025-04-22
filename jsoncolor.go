@@ -694,7 +694,7 @@ func (fs *formatterState) format(dst io.Writer, src []byte, terminateWithNewline
 			break // End of JSON input.
 		}
 		if err != nil {
-			return fmt.Errorf("jsoncolor: error decoding input JSON: %w", err) // More informative error
+			return fmt.Errorf("jsoncolor: error decoding input JSON: %w", err)
 		}
 
 		// Check if more tokens exist at the current nesting level. Important for comma placement.
@@ -709,11 +709,14 @@ func (fs *formatterState) format(dst io.Writer, src []byte, terminateWithNewline
 			// Is it an opening delimiter?
 			if delim == json.Delim('{') || delim == json.Delim('[') {
 				// --- Handle Opening Delimiter ({ or [) ---
-				// Decide spacing *before* the delimiter based on context.
-				if currentFrame.inObject() {
-					fs.printSpace(" ", false) // Space after colon: "key": {
-				} else {
-					fs.printIndent() // Indent at start of line: [ { or { ...
+				// Decide spacing/indentation *before* the delimiter.
+				// The primary case for adding space here is removed because
+				// the space after a colon is handled later. We only need to
+				// handle indentation when the delimiter starts a new line.
+				if !currentFrame.inObject() {
+					// If NOT inside an object (e.g., top-level container or inside an array),
+					// print standard indentation.
+					fs.printIndent()
 				}
 
 				// Print the colorized opening delimiter.
@@ -763,20 +766,15 @@ func (fs *formatterState) format(dst io.Writer, src []byte, terminateWithNewline
 				fs.printIndent()
 			}
 
-			// Spacing check potentially for root scalars (original flawed logic preserved).
-			if !currentFrame.inField() {
-				fs.printSpace(" ", false)
-			}
-
 			// Print the colorized token. `formatToken` internally distinguishes keys and values.
 			err = fs.formatToken(token)
 
 			// --- Post-Token Formatting (Colon or Comma/Newline) ---
 			if currentFrame.inField() {
-				// If `inField` is true *now*, it means `formatToken` just processed an object *key*
-				// (because `toggleField` hasn't run yet for this iteration).
-				// Therefore, print the required colon after the key.
+				// If `inField` is true *now*, it means `formatToken` just processed an object *key*.
+				// Therefore, print the required colon after the key, followed by a space (respecting compact mode).
 				fs.printColon()
+				fs.printSpace(" ", false) // Add space *only* after colon: "key": value
 			} else {
 				// If `formatToken` processed an array element or an object *value*.
 				// Add a comma if needed *after* the element/value.
