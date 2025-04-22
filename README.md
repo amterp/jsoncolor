@@ -27,12 +27,14 @@ This fork fixes that bug so the output becomes:
 ```
 
 Additionally, this fork also updates Go to 1.24 and switches from
-[fatih/color](https://github.com/fatih/color) to [amterp/color](https://github.com/fatih/color)
+[fatih/color](https://github.com/fatih/color) to [amterp/color](https://github.com/amterp/color)
 as the latter similarly contains bug fixes + improvements not yet merged upstream (though I'm hoping this [changes](https://github.com/fatih/color/pull/255)).
+
+Thanks to the original contributors for their work! 🙏
 
 # Original README
 
-*Not quite original, contains updated references to correct libraries, etc*
+*Not quite original, contains updated references to correct libraries, etc.*
 
 [![GoDoc](https://godoc.org/github.com/amterp/jsoncolor?status.svg)](https://godoc.org/github.com/amterp/jsoncolor)
 
