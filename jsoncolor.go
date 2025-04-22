@@ -687,11 +687,6 @@ func (fs *formatterState) format(dst io.Writer, src []byte, terminateWithNewline
 	// currentFrame represents the current nesting context (top-level, object, array, etc.).
 	currentFrame := fs.frame()
 
-	// This flag attempts to track if the root JSON element is an object or array.
-	// NOTE: Its update logic (`&& true`) appears flawed in the original code,
-	// but is preserved here to maintain identical behavior.
-	rootIsContainer := false
-
 	// Loop through each token from the JSON input.
 	for {
 		token, err := dec.Token()
@@ -711,9 +706,6 @@ func (fs *formatterState) format(dst io.Writer, src []byte, terminateWithNewline
 
 		// Is the token a delimiter ({, }, [, ])?
 		if delim, ok := token.(json.Delim); ok {
-			// Update root container flag (original flawed logic preserved).
-			rootIsContainer = rootIsContainer && true
-
 			// Is it an opening delimiter?
 			if delim == json.Delim('{') || delim == json.Delim('[') {
 				// --- Handle Opening Delimiter ({ or [) ---
@@ -772,7 +764,7 @@ func (fs *formatterState) format(dst io.Writer, src []byte, terminateWithNewline
 			}
 
 			// Spacing check potentially for root scalars (original flawed logic preserved).
-			if !currentFrame.inField() && rootIsContainer {
+			if !currentFrame.inField() {
 				fs.printSpace(" ", false)
 			}
 
