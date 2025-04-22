@@ -1,6 +1,3 @@
-// Package jsoncolor is a drop-in replacement for encoding/json's
-// Marshal and MarshalIndent functions and Encoder type which produce
-// colorized output.
 package jsoncolor
 
 import (
@@ -10,7 +7,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/fatih/color"
+	"github.com/amterp/color"
 )
 
 // DefaultFormatter is the Formatter used by Marshal, MarshalIndent
